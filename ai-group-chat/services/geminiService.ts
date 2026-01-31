@@ -1,9 +1,20 @@
 import { GoogleGenAI } from "@google/genai";
 import { Message, Participant } from "../types";
 
-// Initialize the API client
-// Note: In a real environment, ensure process.env.API_KEY is set.
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+     // Initialize the API client lazily
+     // Note: In a real environment, ensure process.env.API_KEY is set.
+     let ai: GoogleGenAI | null = null;
+     
+     function getAI(): GoogleGenAI {
+       if (!ai) {
+         const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+         if (!apiKey) {
+           throw new Error("GEMINI_API_KEY is not set. Please set it in your environment variables.");
+         }
+         ai = new GoogleGenAI({ apiKey });
+       }
+       return ai;
+     }
 
 const MAX_RETRIES = 3;
 const BASE_DELAY_MS = 2000;
@@ -13,7 +24,7 @@ const BASE_DELAY_MS = 2000;
  */
 async function generateWithRetry(model: string, prompt: string, retries = 0): Promise<string> {
   try {
-    const response = await ai.models.generateContent({
+    const response = await getAI().models.generateContent({
       model: model,
       contents: prompt,
       config: {
