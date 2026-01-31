@@ -1,0 +1,5 @@
+{
+  "name": "AI Group Chat",
+  "description": "An interactive group chat simulation where you can converse with multiple AI personas simultaneously using the Gemini API.",
+  "requestFramePermissions": []
+}
